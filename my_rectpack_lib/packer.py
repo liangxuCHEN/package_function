@@ -186,7 +186,7 @@ class PackerOnline(object):
     Rectangles are packed as soon are they are added
     """
 
-    def __init__(self, pack_algo=MaxRectsBssf, rotation=True):
+    def __init__(self, pack_algo=MaxRectsBssf, rotation=True, border=0):
         """
         Arguments:
             pack_algo (PackingAlgorithm): What packing algo to use
@@ -194,6 +194,7 @@ class PackerOnline(object):
         """
         self._rotation = rotation
         self._pack_algo = pack_algo
+        self.border = border
         self.reset()
 
     def __iter__(self):
@@ -261,6 +262,7 @@ class PackerOnline(object):
     def add_bin(self, width, height, count=1, **kwargs):
         # accept the same parameters as PackingAlgorithm objects
         kwargs['rot'] = self._rotation
+        kwargs['border'] = self.border
         bin_factory = BinFactory(width, height, count, self._pack_algo, **kwargs)
         self._empty_bins[next(self._bin_count)] = bin_factory
 
@@ -304,11 +306,12 @@ class Packer(PackerOnline):
     """
 
     def __init__(self, pack_algo=MaxRectsBssf, sort_algo=SORT_NONE, 
-            rotation=True):
+            rotation=True, border=0):
         """
         """
-        super(Packer, self).__init__(pack_algo=pack_algo, rotation=rotation)
-        
+        super(Packer, self).__init__(pack_algo=pack_algo, rotation=rotation, border=border)
+
+        self.border = border
         self._sort_algo = sort_algo
 
         # User provided bins and Rectangles
@@ -393,11 +396,11 @@ class PackerGlobal(Packer, PackerBNFMixin):
     """
     first_item = operator.itemgetter(0)
     
-    def __init__(self, pack_algo=MaxRectsBssf, rotation=True):
+    def __init__(self, pack_algo=MaxRectsBssf, rotation=True, border=0):
         """
         """
         super(PackerGlobal, self).__init__(pack_algo=pack_algo,
-            sort_algo=SORT_NONE, rotation=rotation)
+            sort_algo=SORT_NONE, rotation=rotation, border=border)
 
     def _find_best_fit(self, pbin):
         """
@@ -523,7 +526,8 @@ def newPacker(mode=PackingMode.Offline,
          bin_algo=PackingBin.BBF, 
         pack_algo=MaxRectsBssf,
         sort_algo=SORT_AREA, 
-        rotation=True):
+        rotation=True,
+        border=0):
     """
     Packer factory helper function
 
@@ -539,7 +543,6 @@ def newPacker(mode=PackingMode.Offline,
         Packer: Initialized packer instance.
     """
     packer_class = None
-
     # Online Mode
     if mode == PackingMode.Online:
         sort_algo=None
@@ -571,8 +574,8 @@ def newPacker(mode=PackingMode.Offline,
 
     if sort_algo:
         return packer_class(pack_algo=pack_algo, sort_algo=sort_algo, 
-            rotation=rotation)
+            rotation=rotation, border=border)
     else:
-        return packer_class(pack_algo=pack_algo, rotation=rotation)
+        return packer_class(pack_algo=pack_algo, rotation=rotation, border=border)
 
 

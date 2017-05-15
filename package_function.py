@@ -728,7 +728,7 @@ def find_one_best(shape_x, shape_y, place, num_shape, texture, border, width, he
     return situation, empty_place
 
 
-def get_shape_data(data, width):
+def get_shape_data(data, width, num_pic=1):
     """
     输入是一个字符串如：400 500 30;130 250 10;800 900 5;
     没有空格，然后通过处理，返回两个队列
@@ -746,7 +746,7 @@ def get_shape_data(data, width):
             x, y, num = shape.split(' ')
             x = int(x)
             y = int(y)
-            num = int(num)
+            num = int(num) * num_pic
             shape_list.append((x, y))
             shape_num.append(num)
         except:

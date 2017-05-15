@@ -10,7 +10,7 @@ class Guillotine(PackingAlgorithm):
     For a more detailed explanation of the algorithm used, see:
     Jukka Jylanki - A Thousand Ways to Pack the Bin (February 27, 2010)
     """
-    def __init__(self, width, height, rot=True, merge=True, *args, **kwargs):
+    def __init__(self, width, height, rot=True, merge=True, border=0, *args, **kwargs):
         """
         Arguments:
             width (int, float):
@@ -18,9 +18,10 @@ class Guillotine(PackingAlgorithm):
             merge (bool): Optional keyword argument
         """
         self._merge = merge
+        self.border = border
+        kwargs['border'] = border
         super(Guillotine, self).__init__(width, height, rot, *args, **kwargs)
         
-
     def _add_section(self, section):
         """Adds a new section to the free section list, but before that and if 
         section merge is enabled, tries to join the rectangle with all existing 
@@ -38,7 +39,6 @@ class Guillotine(PackingAlgorithm):
             plen = len(self._sections)
             self._sections = [s for s in self._sections if not section.join(s)]
         self._sections.append(section)
-
 
     def _split_horizontal(self, section, width, height):
         """For an horizontal split the rectangle is placed in the lower
@@ -65,16 +65,15 @@ class Guillotine(PackingAlgorithm):
         # interfere when later we try to merge the resulting split
         # rectangles, with the rest of free sections.
         #self._sections.remove(section)
-
+        # TODO: add border
         # Creates two new empty sections, and returns the new rectangle.
-        if height < section.height:
-            self._add_section(Rectangle(section.x, section.y+height,
-                section.width, section.height-height))
+        if height + self.border < section.height:
+            self._add_section(Rectangle(section.x, section.y+height + self.border,
+                section.width, section.height - height - self.border))
 
-        if width < section.width:
-            self._add_section(Rectangle(section.x+width, section.y,
-                section.width-width, height))
-
+        if width + self.border < section.width:
+            self._add_section(Rectangle(section.x + width + self.border, section.y,
+                section.width-width-self.border, height))
 
     def _split_vertical(self, section, width, height):
         """For a vertical split the rectangle is placed in the lower
@@ -97,17 +96,17 @@ class Guillotine(PackingAlgorithm):
         rectangle is created. If both width and height are equal, no sections
         are created.
         """
+        # TODO: add border
         # When a section is split, depending on the rectangle size 
         # two, one, or no new sections will be created. 
-        if height < section.height:
-            self._add_section(Rectangle(section.x, section.y+height,
-                width, section.height-height))
+        if height + self.border < section.height:
+            self._add_section(Rectangle(section.x, section.y + height + self.border,
+                width, section.height-height-self.border))
         
-        if width < section.width:
-            self._add_section(Rectangle(section.x+width, section.y,
-                section.width-width, section.height))
+        if width + self.border < section.width:
+            self._add_section(Rectangle(section.x + width + self.border, section.y,
+                section.width - width - self.border, section.height))
         
-
     def _split(self, section, width, height):
         """
         Selects the best split for a section, given a rectangle of dimmensions
@@ -120,7 +119,6 @@ class Guillotine(PackingAlgorithm):
             height (int, float): Rectangle height
         """
         raise NotImplementedError
-
 
     def _section_fitness(self, section, width, height):
         """The subclass for each one of the Guillotine selection methods,
@@ -162,8 +160,7 @@ class Guillotine(PackingAlgorithm):
 
         return sec, rot
 
-
-    def add_rect(self, width, height, rid=None):     
+    def add_rect(self, width, height, rid=None):
         """
         Add rectangle of widthxheight dimensions.
 

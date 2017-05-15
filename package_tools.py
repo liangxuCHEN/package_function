@@ -8,7 +8,7 @@ def use_rate(use_place, width, height):
     total_use = 0
     for b_x, b_y, w, h in use_place:
         total_use += w * h
-    return int(float(total_use)/width/height * 100)/100.0
+    return int(float(total_use)/(width*height+(width+height)*10 - 100) * 100)/100.0
 
 
 def draw_many_pics(positions, width, height, path, border=0):
@@ -116,14 +116,6 @@ def tidy_shape(shapes, shapes_num, texture, vertical):
             if shape_x > shape_y:
                 shape_x, shape_y = shape_y, shape_x
             tmp_list.append((shape_x, shape_y))
-
-    for i in range(len(tmp_list), 1, -1):
-        for j in range(0, i-1):
-            # 长度大于宽带，比较方式就是看长的边长，若长相等，看宽
-            if tmp_list[j][1] < tmp_list[j + 1][1] or (
-                            tmp_list[j][1] == tmp_list[j + 1][1] and tmp_list[j][0] < tmp_list[j + 1][0]):
-                tmp_list[j], tmp_list[j + 1] = tmp_list[j + 1], tmp_list[j]
-                shapes_num[j], shapes_num[j + 1] = shapes_num[j + 1], shapes_num[j]
 
     # 结合数量，合并成一个新的队列
     index_shape = 0
