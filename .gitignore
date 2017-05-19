@@ -1,0 +1,12 @@
+settings.py
+
+*.pyc
+
+*.log
+
+.idea
+*.txt
+*.png
+simsun.ttc
+res_doc/
+tests/

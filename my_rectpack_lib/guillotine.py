@@ -65,7 +65,6 @@ class Guillotine(PackingAlgorithm):
         # interfere when later we try to merge the resulting split
         # rectangles, with the rest of free sections.
         #self._sections.remove(section)
-        # TODO: add border
         # Creates two new empty sections, and returns the new rectangle.
         if height + self.border < section.height:
             self._add_section(Rectangle(section.x, section.y+height + self.border,
@@ -96,8 +95,7 @@ class Guillotine(PackingAlgorithm):
         rectangle is created. If both width and height are equal, no sections
         are created.
         """
-        # TODO: add border
-        # When a section is split, depending on the rectangle size 
+        # When a section is split, depending on the rectangle size
         # two, one, or no new sections will be created. 
         if height + self.border < section.height:
             self._add_section(Rectangle(section.x, section.y + height + self.border,
@@ -217,6 +215,8 @@ class Guillotine(PackingAlgorithm):
         self._sections = []
         self._add_section(Rectangle(0, 0, self.width, self.height))
 
+    def get_sections(self):
+        return self._sections
 
 
 class GuillotineBaf(Guillotine):

@@ -27,24 +27,24 @@ def float2dec(ft, decimal_digits):
 
 # Sorting algos for rectangle lists
 SORT_AREA  = lambda rectlist: sorted(rectlist, reverse=True, 
-        key=lambda r: r[0]*r[1]) # Sort by area
+        key=lambda r: r[0]*r[1])  # Sort by area
 
 SORT_PERI  = lambda rectlist: sorted(rectlist, reverse=True, 
-        key=lambda r: r[0]+r[1]) # Sort by perimeter
+        key=lambda r: r[0]+r[1])  # Sort by perimeter
 
 SORT_DIFF  = lambda rectlist: sorted(rectlist, reverse=True, 
-        key=lambda r: abs(r[0]-r[1])) # Sort by Diff
+        key=lambda r: abs(r[0]-r[1]))  # Sort by Diff
 
 SORT_SSIDE = lambda rectlist: sorted(rectlist, reverse=True, 
-        key=lambda r: (min(r[0], r[1]), max(r[0], r[1]))) # Sort by short side
+        key=lambda r: (min(r[0], r[1]), max(r[0], r[1])))  # Sort by short side
 
 SORT_LSIDE = lambda rectlist: sorted(rectlist, reverse=True, 
-        key=lambda r: (max(r[0], r[1]), min(r[0], r[1]))) # Sort by long side
+        key=lambda r: (max(r[0], r[1]), min(r[0], r[1])))  # Sort by long side
 
 SORT_RATIO = lambda rectlist: sorted(rectlist, reverse=True,
-        key=lambda r: r[0]/r[1]) # Sort by side ratio
+        key=lambda r: r[0]/r[1])  # Sort by side ratio
 
-SORT_NONE = lambda rectlist: list(rectlist) # Unsorted
+SORT_NONE = lambda rectlist: list(rectlist)  # Unsorted
 
 
 
@@ -95,6 +95,12 @@ class BinFactory(object):
     def __str__(self):
         return "Bin: {} {} {}".format(self._width, self._height, self._count)
 
+    # TODO: return sections
+    def get_sections(self):
+        if self._ref_bin:
+            return self._ref_bin.get_sections()
+        else:
+            return None
 
 
 class PackerBNFMixin(object):
@@ -298,6 +304,21 @@ class PackerOnline(object):
         # User provided bins not in current use
         self._empty_bins = collections.OrderedDict() # O(1) deletion of arbitrary elem
         self._bin_count = itertools.count()
+
+    # TODO: return all the empty section
+    def get_sections(self):
+        empty_section = []
+
+        for bin in self:
+            tmp_list = list()
+            sections = bin.get_sections()
+
+            for section in sections:
+                tmp_list.append((section.x, section.y, section.width, section.height))
+
+            empty_section.append(tmp_list)
+
+        return empty_section
 
 
 class Packer(PackerOnline):
