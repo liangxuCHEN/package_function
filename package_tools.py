@@ -157,8 +157,8 @@ def write_desc_doc(shapes, shapes_num, path, width, height, positions, num_list,
                 i_place += 1
 
 
-def draw_one_pic(positions, rates, width, height, path, border=0, num_list=None,
-                 shapes=None, empty_positions=None, title=None):
+def draw_one_pic(positions, rates, width=None, height=None, path=None, border=0, num_list=None,
+                 shapes=None, empty_positions=None, title=None, bins_list=None):
     # 多个图像需要处理
 
     if shapes is not None:
@@ -217,12 +217,23 @@ def draw_one_pic(positions, rates, width, height, path, border=0, num_list=None,
 
                     ax1.annotate(p_id, (cx, cy), color='black', weight='bold',
                                  fontsize=6, ha='center', va='center')
+            # 坐标长度
+            if width is not None and height is not None:
+                ax1.set_xlim(0, width)
+                ax1.set_ylim(0, height)
+            elif bins_list is not None:
+                ax1.set_xlim(0, bins_list[i_p][0])
+                ax1.set_ylim(0, bins_list[i_p][1])
+            else:
+                ax1.set_xlim(0, 2430)
+                ax1.set_ylim(0, 1210)
 
-            ax1.set_xlim(0, width)
-            ax1.set_ylim(0, height)
         i_p += 1
 
-    fig1.savefig('%s.png' % path)
+    if path is not None:
+        fig1.savefig('%s.png' % path)
+    else:
+        fig1.show()
 
 
 def find_the_same_position(positions):
@@ -414,14 +425,17 @@ def get_shape_data(shape_data, bin_data, num_pic=1):
                 'error': True,
                 'info': u'板木数据输入的格式不对, 一组数据之间用空格, 数据之间用分号<;>, 最后结尾不要放分号<;>, 而且要用英文标点'
             }
-    print bin_list
     # 组件尺寸信息
     shapes = shape_data.split(';')
     for shape in shapes:
         try:
             bin_type, x, y, num = shape.split(' ')
-            x = int(x)
-            y = int(y)
+            try:
+                x = int(x)
+                y = int(y)
+            except:
+                x = float(x)
+                y = float(y)
             num = int(num) * num_pic
             if bin_type in bin_list:
                 data_dict[bin_type]['shape_list'].append((x, y))
