@@ -2,6 +2,17 @@
 from package import PackerSolution
 from package_tools import find_the_same_position, use_rate, draw_one_pic
 
+"""
+    data
+    'bin_key': bin_key,
+    'solution': best_solution,
+    'empty_section': empty_positions,
+    'rate': best_rate,
+    'algo_id': best_packer,
+    'bins_list': bins_list,
+    'shape_list': shape_list
+"""
+
 
 if __name__ == '__main__':
     shape_data = '[{"SkuCode":"32050038","Length":1294.0,"Width":398.0,"Amount":9},{"SkuCode":"32050093","Length":1444.0,"Width":296.0,"Amount":9},{"SkuCode":"32010004","Length":1056.0,"Width":279.0,"Amount":9},{"SkuCode":"32010004","Length":1200.0,"Width":330.0,"Amount":9},{"SkuCode":"32050051","Length":2010.0,"Width":128.0,"Amount":18},{"SkuCode":"32050052","Length":1444.0,"Width":456.0,"Amount":9},{"SkuCode":"32050052","Length":1444.0,"Width":163.0,"Amount":9}]'

@@ -4,6 +4,9 @@ from my_rectpack_lib.packer import newPacker
 import my_rectpack_lib.guillotine as guillotine
 import my_rectpack_lib.packer as packer
 
+EMPTY_SECTION_MIN_SIZE = 200000    # 面积 0.2 m^2
+EMPTY_SECTION_MIN_HEIGHT = 58      # 最小边长 58 mm
+
 
 def output_res(all_rects, bins_list):
     rects = list()
@@ -306,10 +309,12 @@ def get_shape_data(shape_data, bin_data, bins_num):
     return {'data': data_dict, 'error': False}
 
 
-def is_valid_empty_section(empty_sections):
+def is_valid_empty_section(empty_sections, min_size, min_height):
     # TODO: 参数调整预料判断
-    min_size = 200000    # 面积 0.2 m^2
-    min_height = 58      # 最小边长 58 mm
+    if min_size is None:
+        min_size = EMPTY_SECTION_MIN_SIZE
+    if min_height is None:
+        min_height = EMPTY_SECTION_MIN_HEIGHT
     total_ares = 0
     res_empty_section = list()
     for sections in empty_sections:
@@ -328,7 +333,8 @@ class PackerSolution(object):
     """
     compare all the packer algorithm
     """
-    def __init__(self, rects_data, bins_data, border=0, bins_num=None, num_pic=1):
+    def __init__(self, rects_data, bins_data, border=0,
+                 bins_num=None, num_pic=1, empty_section_min_size=None, empty_section_min_len=None):
         """
         :param rect_data: rect_data 输入是一个字符串如：板A 400 500 30;板A 130 250 10;板B 800 900 5;
         :param bin_data:  : A 三聚氰胺板-双面胡桃木哑光(J2496-4)25mm 2430*1210*18 是;B 三聚氰胺板-双面白布纹哑光（18mm） 2430 1210 0 0;
@@ -336,6 +342,8 @@ class PackerSolution(object):
         :param border: 切割间隙
         """
         self._border = border
+        self._empty_section_min_size = empty_section_min_size
+        self._empty_section_min_len = empty_section_min_len
         try:
             self._data = get_shape_data_from_json(rects_data, bins_data, bins_num, num_pic=num_pic)
         except:
@@ -494,7 +502,8 @@ class PackerSolution(object):
             avg_rate, tmp_solution = output_res(my_pack.rect_list(), my_pack.bin_list())
             bin_num = len(tmp_solution)
             # 余料判断
-            tmp_empty_position, empty_ares = is_valid_empty_section(my_pack.get_sections())
+            tmp_empty_position, empty_ares = is_valid_empty_section(
+                my_pack.get_sections(), self._empty_section_min_size, self._empty_section_min_len)
             # print(u'算法%d >>> 平均利用率:%s, 使用%d块, 余料总面积:%d' % (
             #    index_packer, str(avg_rate), len(tmp_solution), empty_ares))
 

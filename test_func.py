@@ -74,6 +74,13 @@ class PackerTestCaseFalse(unittest.TestCase):
         self.assertEqual(self.packer.get_bin_data('32050052', key='is_texture'), 0)
         self.packer.find_solution(algo_list=[40])
 
+        shape_data = '[{"SkuCode":"32050052","Length":548.0,"Width":397.0,"Amount":11}]'
+        bin_data = u'[{"SkuCode":"32050052","ItemName":"三聚氰胺板-双面仿古白哑光单保(25mm)","SkuName":"2440*1220*25mm","HasGrain":"否"},{"SkuCode":"32050519","ItemName":"三聚氰胺板-双面仿古白哑光双保(25mm)","SkuName":"2440*1220*25mm","HasGrain":"否"},{"SkuCode":"32050093","ItemName":"三聚氰胺板-双面仿古白哑光(18mm)","SkuName":"2440*1220*18mm","HasGrain":"否"},{"SkuCode":"32050038","ItemName":"三聚氰胺板-双面仿古白哑光单保(18mm)","SkuName":"2440*1220*18mm","HasGrain":"否"},{"SkuCode":"32050076","ItemName":"三聚氰胺板-双面仿古白哑光(5mm)","SkuName":"2440*1220*5mm","HasGrain":"否"},{"SkuCode":"32050434","ItemName":"三聚氰胺板-2#8834双面仿橡胶木哑光(12mm)","SkuName":"2440*1220*12mm","HasGrain":"是"},{"SkuCode":"32010003","ItemName":"中纤板(E1)-B(18mm)","SkuName":"2440*1220*18mm","HasGrain":"否"},{"SkuCode":"32010004","ItemName":"中纤板(E1)-B(25mm)","SkuName":"2440*1220*25mm","HasGrain":"否"},{"SkuCode":"32050051","ItemName":"三聚氰胺板-双面仿古白哑光(25mm)","SkuName":"2440*1220*25mm","HasGrain":"否"}]'
+        self.packer = PackerSolution(shape_data, bin_data, empty_section_min_len=10, empty_section_min_size=1000)
+        self.assertTrue(self.packer.is_valid())
+        self.assertEqual(self.packer.get_bin_data('32050052', key='is_texture'), 0)
+        self.packer.find_solution(algo_list=[40])
+
 # 测试
 if __name__ == "__main__":
     unittest.main()
