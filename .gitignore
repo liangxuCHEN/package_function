@@ -10,3 +10,4 @@ settings.py
 simsun.ttc
 res_doc/
 tests/
+*.rar
