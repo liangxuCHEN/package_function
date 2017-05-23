@@ -10,7 +10,6 @@ from package_tools import find_the_same_position, use_rate, draw_one_pic
     'rate': best_rate,
     'algo_id': best_packer,
     'bins_list': bins_list,
-    'shape_list': shape_list
 """
 
 

@@ -13,6 +13,7 @@ if __name__ == '__main__':
         for data in res:
             best_solution = data['solution']
             bins_list = data['bins_list']
+            shape_list = packer.get_bin_data(data['bin_key'], key='shape_list')
 
             # 计算使用率
             rate_list = list()
@@ -24,9 +25,9 @@ if __name__ == '__main__':
             # 返回唯一的排版列表，以及数量
             same_bin_list = find_the_same_position(best_solution)
 
-            draw_one_pic(best_solution, rate_list, width=2430,height=1210,
-                        path='package_min_b' + data['bin_key'], border=1, num_list=same_bin_list, title=title,
-                        shapes=data['shape_list'], empty_positions=data['empty_section'])
+            draw_one_pic(best_solution, rate_list, width=2430, height=1210,
+                         path='package_min_b' + data['bin_key'], border=1, num_list=same_bin_list, title=title,
+                         shapes=shape_list, empty_positions=data['empty_section'])
 
     else:
         print packer.error_info()

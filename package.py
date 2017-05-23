@@ -431,6 +431,7 @@ class PackerSolution(object):
         best_empty_positions: 余料坐标
         best_rate: 方案的平均利用率
         best_packer: 方案（算法）的ID
+        bins_list : 已使用板木尺寸信息
         """
         bin_width = self.get_bin_data(bin_key, key='width')
         bin_height = self.get_bin_data(bin_key, key='height')
@@ -477,7 +478,7 @@ class PackerSolution(object):
                 my_pack.add_rect(*r)
 
         # Add the bins where the rectangles will be placed
-        # TODO: 添加出入参数，选择可以使用的板材尺寸和数量
+        # 添加出入参数，选择可以使用的板材尺寸和数量
         NUM = 5000
         for my_pack in list_packer:
             if bins_num is not None:
@@ -498,7 +499,6 @@ class PackerSolution(object):
 
         for my_pack in list_packer:
             my_pack.pack()
-            # TODO:avg_rate has errors
             avg_rate, tmp_solution = output_res(my_pack.rect_list(), my_pack.bin_list())
             bin_num = len(tmp_solution)
             # 余料判断
@@ -540,7 +540,7 @@ class PackerSolution(object):
                 # 没有数据
                 if len(all_shapes) == 0:
                     continue
-                # TODO:bin info
+                # bin info
                 bins_num = None
                 if 'bins_num' in self._data['data'][bin_key]:
                     bins_num = self.get_bin_data(bin_key, key='bins_num')
@@ -555,34 +555,8 @@ class PackerSolution(object):
                     'rate': best_rate,
                     'algo_id': best_packer,
                     'bins_list': bins_list,
-                    'shape_list': shape_list
                 })
             return result_list
 
         return None
-
-    def _get_bins_num(self, bins_num):
-        """
-        :param bins_num:  : A 2230*1010*18 3;A 1230*810*18 3
-        :return:
-        """
-        bins_key = self.get_bins_key()
-        res_dict = {}
-        for key in bins_key:
-            res_dict[key] = list()
-        try:
-            res = bins_num.split(';')
-            for data in res:
-                data_key, size_value, num = data.split(' ')
-                tmp_size = size_value.split('*')
-                res_dict[data_key].append({
-                    'w': int(tmp_size[0]),
-                    'h': int(tmp_size[1]),
-                    'num': int(num)
-                })
-        except:
-            return {'error': True, 'info': u'板木余料数据输入有误'}
-
-        return res_dict
-
 
