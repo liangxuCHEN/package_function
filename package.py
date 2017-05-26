@@ -4,8 +4,9 @@ from my_rectpack_lib.packer import newPacker
 import my_rectpack_lib.guillotine as guillotine
 import my_rectpack_lib.packer as packer
 
-EMPTY_SECTION_MIN_SIZE = 200000    # 面积 0.2 m^2
-EMPTY_SECTION_MIN_HEIGHT = 58      # 最小边长 58 mm
+EMPTY_SECTION_MIN_SIZE = 80000    # 面积 0.08 m^2
+EMPTY_SECTION_MIN_HEIGHT = 190    # 最小短边 190 mm
+EMPTY_SECTION_MIN_WIDTH = 380     # 最小长边 380 mm
 
 
 def output_res(all_rects, bins_list):
@@ -309,20 +310,32 @@ def get_shape_data(shape_data, bin_data, bins_num):
     return {'data': data_dict, 'error': False}
 
 
-def is_valid_empty_section(empty_sections, min_size, min_height):
-    # TODO: 参数调整预料判断
+def is_valid_empty_section(empty_sections, min_size, min_height, min_width, is_texture):
+    # 参数调整筛选余料
     if min_size is None:
         min_size = EMPTY_SECTION_MIN_SIZE
     if min_height is None:
         min_height = EMPTY_SECTION_MIN_HEIGHT
+    if min_width is None:
+        min_width = EMPTY_SECTION_MIN_HEIGHT
     total_ares = 0
     res_empty_section = list()
     for sections in empty_sections:
         section_list = list()
         for section in sections:
-            if section[2] * section[3] > min_size and min(section[2], section[3]) > min_height:
+            if section[2] * section[3] > min_size:
                 section_list.append(section)
                 total_ares += section[2] * section[3]
+            else:
+                if is_texture == 0:
+                    # 没有纹理
+                    if min(section[2], section[3]) > min_height and max(section[2], section[3])>min_width:
+                        section_list.append(section)
+                        total_ares += section[2] * section[3]
+                elif section[2] > min_width and section[3] > min_height:
+                    # 有纹理
+                    section_list.append(section)
+                    total_ares += section[2] * section[3]
 
         res_empty_section.append(section_list)
 
@@ -333,21 +346,28 @@ class PackerSolution(object):
     """
     compare all the packer algorithm
     """
-    def __init__(self, rects_data, bins_data, border=0,
-                 bins_num=None, num_pic=1, empty_section_min_size=None, empty_section_min_len=None):
+    def __init__(self, rects_data, bins_data, border=5,
+                 bins_num=None, num_pic=1,
+                 empty_section_min_size=None,
+                 empty_section_min_height=None,
+                 empty_section_min_width=None):
         """
         :param rect_data: rect_data 输入是一个字符串如：板A 400 500 30;板A 130 250 10;板B 800 900 5;
         :param bin_data:  : A 三聚氰胺板-双面胡桃木哑光(J2496-4)25mm 2430*1210*18 是;B 三聚氰胺板-双面白布纹哑光（18mm） 2430 1210 0 0;
-        :param bins_num:  : A 2230*1010*18 3;A 1230*810*18 3
+        :param bins_num（余料再利用）:  : A 2230*1010*18 3;A 1230*810*18 3
         :param border: 切割间隙
         """
         self._border = border
         self._empty_section_min_size = empty_section_min_size
-        self._empty_section_min_len = empty_section_min_len
+        self._empty_section_min_height = empty_section_min_height
+        self._empty_section_min_width = empty_section_min_width
         try:
             self._data = get_shape_data_from_json(rects_data, bins_data, bins_num, num_pic=num_pic)
         except:
             self._data = get_shape_data(rects_data, bins_data, bins_num)
+
+    def get_border(self):
+        return self._border
 
     def is_valid(self):
         if self._data['error']:
@@ -431,7 +451,6 @@ class PackerSolution(object):
         best_empty_positions: 余料坐标
         best_rate: 方案的平均利用率
         best_packer: 方案（算法）的ID
-        bins_list : 已使用板木尺寸信息
         """
         bin_width = self.get_bin_data(bin_key, key='width')
         bin_height = self.get_bin_data(bin_key, key='height')
@@ -478,7 +497,7 @@ class PackerSolution(object):
                 my_pack.add_rect(*r)
 
         # Add the bins where the rectangles will be placed
-        # 添加出入参数，选择可以使用的板材尺寸和数量
+        # 添加余料板材尺寸 == 选择可以使用的板材尺寸和数量
         NUM = 5000
         for my_pack in list_packer:
             if bins_num is not None:
@@ -503,7 +522,12 @@ class PackerSolution(object):
             bin_num = len(tmp_solution)
             # 余料判断
             tmp_empty_position, empty_ares = is_valid_empty_section(
-                my_pack.get_sections(), self._empty_section_min_size, self._empty_section_min_len)
+                my_pack.get_sections(),
+                self._empty_section_min_size,
+                self._empty_section_min_height,
+                self._empty_section_min_width,
+                self.get_bin_data(bin_key, key='is_vertical')
+            )
             # print(u'算法%d >>> 平均利用率:%s, 使用%d块, 余料总面积:%d' % (
             #    index_packer, str(avg_rate), len(tmp_solution), empty_ares))
 
@@ -540,6 +564,7 @@ class PackerSolution(object):
                 # 没有数据
                 if len(all_shapes) == 0:
                     continue
+
                 # bin info
                 bins_num = None
                 if 'bins_num' in self._data['data'][bin_key]:
@@ -551,7 +576,7 @@ class PackerSolution(object):
                 result_list.append({
                     'bin_key': bin_key,
                     'solution': best_solution,
-                    'empty_section': empty_positions,
+                    'empty_sections': empty_positions,
                     'rate': best_rate,
                     'algo_id': best_packer,
                     'bins_list': bins_list,
@@ -559,4 +584,5 @@ class PackerSolution(object):
             return result_list
 
         return None
+
 
