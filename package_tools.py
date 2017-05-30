@@ -236,6 +236,18 @@ def draw_one_pic(positions, rates, width=None, height=None, path=None, border=0,
         fig1.show()
 
 
+def draw_rates(y_value, x_value, title):
+    fig1 = Figure(figsize=(10, 10))
+    # 使用中文
+    font_set = FontProperties(fname='simsun.ttc', size=12)
+    fig1.suptitle(title, fontweight='bold', fontproperties=font_set)
+    FigureCanvas(fig1)
+    ax1 = fig1.add_subplot(111)
+    ax1.set_ylim(0, 1)
+    ax1.plot(x_value, y_value, "b-")
+    fig1.savefig('%s.png' % title)
+
+
 def find_the_same_position(positions):
     # 初始化，默认每个都不一样，数量都是1
     num_list = [1] * len(positions)
