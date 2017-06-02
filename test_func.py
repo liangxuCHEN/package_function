@@ -2,7 +2,6 @@
 from package import PackerSolution
 import unittest
 
-
 # 执行测试的类
 class PackerTestCaseTrue(unittest.TestCase):
     def setUp(self):
@@ -84,3 +83,4 @@ class PackerTestCaseFalse(unittest.TestCase):
 # 测试
 if __name__ == "__main__":
     unittest.main()
+

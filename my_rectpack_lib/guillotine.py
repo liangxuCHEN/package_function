@@ -1,5 +1,5 @@
-from .pack_algo import PackingAlgorithm
-from .geometry import Rectangle
+from pack_algo import PackingAlgorithm
+from geometry import Rectangle
 import itertools
 import operator
 
@@ -66,13 +66,18 @@ class Guillotine(PackingAlgorithm):
         # rectangles, with the rest of free sections.
         #self._sections.remove(section)
         # Creates two new empty sections, and returns the new rectangle.
+
         if height + self.border < section.height:
-            self._add_section(Rectangle(section.x, section.y+height + self.border,
+            self._add_section(Rectangle(
+                section.x, section.y+height + self.border,
                 section.width, section.height - height - self.border))
+            self.cut_linear += section.width
 
         if width + self.border < section.width:
-            self._add_section(Rectangle(section.x + width + self.border, section.y,
+            self._add_section(Rectangle(
+                section.x + width + self.border, section.y,
                 section.width-width-self.border, height))
+            self.cut_linear += height
 
     def _split_vertical(self, section, width, height):
         """For a vertical split the rectangle is placed in the lower
@@ -96,15 +101,19 @@ class Guillotine(PackingAlgorithm):
         are created.
         """
         # When a section is split, depending on the rectangle size
-        # two, one, or no new sections will be created. 
+        # two, one, or no new sections will be created.
         if height + self.border < section.height:
-            self._add_section(Rectangle(section.x, section.y + height + self.border,
+            self._add_section(Rectangle(
+                section.x, section.y + height + self.border,
                 width, section.height-height-self.border))
-        
+            self.cut_linear += width
+
         if width + self.border < section.width:
-            self._add_section(Rectangle(section.x + width + self.border, section.y,
+            self._add_section(Rectangle(
+                section.x + width + self.border, section.y,
                 section.width - width - self.border, section.height))
-        
+            self.cut_linear += section.height
+
     def _split(self, section, width, height):
         """
         Selects the best split for a section, given a rectangle of dimmensions
@@ -157,6 +166,9 @@ class Guillotine(PackingAlgorithm):
             return None, None
 
         return sec, rot
+
+    def get_cut_linear(self):
+        return self._cut_linear
 
     def add_rect(self, width, height, rid=None):
         """
