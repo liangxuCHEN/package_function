@@ -205,9 +205,11 @@ def draw_one_pic(positions, rates, width=None, height=None, path=None, border=0,
                 ax1.add_patch(p)
                 # 计算显示位置
                 if shapes is not None:
+
                     rx, ry = p.get_xy()
                     cx = rx + p.get_width() / 2.0
                     cy = ry + p.get_height() / 2.0
+
                     # 找到对应的序号
                     p_id = -1
                     if (p.get_width(), p.get_height()) in shapes:
@@ -215,8 +217,21 @@ def draw_one_pic(positions, rates, width=None, height=None, path=None, border=0,
                     if (p.get_height(), p.get_width()) in shapes:
                         p_id = shapes.index((p.get_height(), p.get_width()))
 
-                    ax1.annotate(p_id, (cx, cy), color='black', weight='bold',
-                                 fontsize=6, ha='center', va='center')
+                    # 标记尺寸
+                    shape_label = "({p_id}){width}x{height}".format(
+                        p_id=p_id, width=p.get_width(), height=p.get_height())
+
+                    rotation = 0
+                    if p.get_width() < 450:
+                        if p.get_height() > 450 and p.get_width() > 50:
+                            rotation = 90
+                        else:
+                            shape_label = p_id
+                    elif p.get_height() < 50:
+                        shape_label = p_id
+
+                    ax1.annotate(shape_label, (cx, cy), color='black', weight='bold',
+                                 fontsize=8, ha='center', va='center', rotation=rotation)
             # 坐标长度
             if width is not None and height is not None:
                 ax1.set_xlim(0, width)
