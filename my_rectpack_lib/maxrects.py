@@ -1,5 +1,5 @@
-from .pack_algo import PackingAlgorithm
-from .geometry import Rectangle
+from pack_algo import PackingAlgorithm
+from geometry import Rectangle
 import itertools
 import collections
 import operator

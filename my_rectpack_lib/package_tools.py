@@ -249,7 +249,7 @@ def del_same_data(same_bin_list, data_list):
 
 
 def detail_text(shape_list, situation_list, num_list):
-    reslut = list()
+    result = list()
 
     for shape in shape_list:
         data_dict = {}
@@ -268,9 +268,9 @@ def detail_text(shape_list, situation_list, num_list):
                 data_dict['num_list'].append(count)
             id_situation += 1
 
-        reslut.append(data_dict)
+        result.append(data_dict)
 
-    return json.dumps(reslut)
+    return json.dumps(result)
 
 
 def detail_empty_sections(empty_sections, shape_list, border, is_texture, is_vertical):
@@ -341,6 +341,10 @@ def package_main_function(input_data, pathname):
             cut_linear_p = int(input_data['cut_linear_p'])
             empty_section_p = int(input_data['empty_section_p'])
 
+    if 'effective_rate' in input_data.keys():
+        effective_rate = float(input_data['empty_section_p'])
+    else:
+        effective_rate = EFFECTIVE_RATE
 
     # 创建分析对象
     packer = PackerSolution(
@@ -379,7 +383,7 @@ def package_main_function(input_data, pathname):
                 r = use_rate(best_solution[s_id], bins_list[s_id][0], bins_list[s_id][1])
                 empty_r = use_rate(empty_sections[s_id], bins_list[s_id][0], bins_list[s_id][1])
                 rate_list.append(r)
-                total_rate_list.append(float("%0.4f" % (empty_r * EFFECTIVE_RATE + r)))
+                total_rate_list.append(float("%0.4f" % (empty_r * effective_rate + r)))
                 # 余料总面积
                 empty_ares_list.append(empty_ares(empty_sections[s_id]))
 

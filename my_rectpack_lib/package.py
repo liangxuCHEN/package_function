@@ -546,7 +546,9 @@ class PackerSolution(object):
                 min_cut_linear = tmp_cut_linear
                 best_packer = index_packer
             elif min_bin_num == bin_num:
-                is_better = float(empty_ares - max_empty_ares) / max_empty_ares * self._empty_section_p
+                is_better = 0
+                if max_empty_ares != 0:
+                    is_better = float(empty_ares - max_empty_ares) / max_empty_ares * self._empty_section_p
                 is_better += float(min_cut_linear - tmp_cut_linear) / min_cut_linear * self._cut_linear_p
                 if is_better > 0:
                     best_solution = tmp_solution
